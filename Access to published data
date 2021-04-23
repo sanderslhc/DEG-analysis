@@ -1,0 +1,20 @@
+#1.下载安装Aspeara
+wget http://d3gcli72yxqn2z.cloudfront.net/connect/bin/aspera-connect-3.5.1.92523-linux-64.tar.gz
+tar zxf aspera-connect-3.5.1.92523-linux-64.tar.gz
+sh aspera-connect-3.5.1.92523-linux-64.sh
+
+#2.准备工作
+#（1）配置环境
+echo 'PATH=$PATH:~/.aspera/connect/bin/' >> ~/.bashrc #./aspera是隐藏文件，需要用ls -a查看
+source ~/.bashrc
+#（2）文件拷贝
+cp ~/.aspera/connect/etc/asperaweb_id_dsa.putty ~/ #复制文件下的密钥文件到主目录下
+cp ~/.aspera/connect/etc/aspera-license /usr/local/bin/ #复制证书到bin目录下
+#（3）获取数据地址链接
+ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRRXXX/XXX/SRRXXXXXXX/SRRXXXXXXX_1.fastq.gz #从EBI获取fastq数据
+ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByStudy/sra/SRP/SRPXXX/SRPXXXXXX/SRRXXXXXXX/SRRXXXXXXX.sra #从NCBI获取SRR数据
+
+#3.下载数据
+cd ~/data
+ascp -QTr -l 300M -k 1 -i ~/.aspera/connect/etc/asperaweb_id_dsa.putty anonftp@ftp-private.ncbi.nlm.nih.gov:/sra/sra-instant/reads/ByRun/sra/ERR/ERR105/ERR105009/ERR105009.sra
+ascp -QTr -l 300M -k 1 -i ~/.aspera/connect/etc/asperaweb_id_dsa.putty era-fasp@fasp.sra.ebi.ac.uk:/vol1/fastq/SRRXXX/XXX/SRRXXXXXXX/SRRXXXXXXX_1.fastq.gz
