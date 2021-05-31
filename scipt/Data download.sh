@@ -110,4 +110,4 @@ a3='_1.fastq.gz .'
 a4='_2.fastq.gz .'
 echo $a0$a1$a2$a2$a3
 echo $a0$a1$a2$a2$a4
-
+done
