@@ -7,4 +7,4 @@ This is my experience about gene differentially expressed analysis, including fo
 (5) Counts value;
 (6) Differentially expressed analysis
 
-The softwares contain Aspera, FASTQC, Trimmatic, STAR, Featurecount and R.
+The softwares contain Aspera, FASTQC, Trimmatic, STAR, stringtie, Featurecount and R.
