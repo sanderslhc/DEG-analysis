@@ -1,9 +1,3 @@
-#!/bin/bash
-#SBATCH -J Data
-#SBATCH -p cast
-#SBATCH -N 1
-#SBATCH --cpus-per-task 2
-
 #1. Access to publihed RNA-seq data
 
 #Create environment variables
@@ -116,4 +110,4 @@ a3='_1.fastq.gz .'
 a4='_2.fastq.gz .'
 echo $a0$a1$a2$a2$a3
 echo $a0$a1$a2$a2$a4
-done
+
