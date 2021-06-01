@@ -49,6 +49,7 @@ STAR \
 --readFilesIn ${i}_1.fq.gz ${i}_2.fq.gz \
 --outFileNamePrefix /home/Sundongxiao/WORKSPACE/lhc/STAR-2.7.9a/data/Jejunum/${i}.sorted \
 --outBAMsortingThreadN 5
+done
 
 #PB1
 cd ~/data/PB1
@@ -64,6 +65,7 @@ STAR \
 --readFilesIn ${i}.fastq.gz \
 --outFileNamePrefix /home/Sundongxiao/WORKSPACE/lhc/STAR-2.7.9a/data/PB1/${i}.sorted \
 --outBAMsortingThreadN 5
+done
 
 #ICV
 cd ~/data/ICV
@@ -79,6 +81,7 @@ STAR \
 --readFilesIn ${i}.fastq.gz \
 --outFileNamePrefix /home/Sundongxiao/WORKSPACE/lhc/STAR-2.7.9a/data/ICV/${i}.sorted \
 --outBAMsortingThreadN 5
+done
 
 #PB2
 cd ~/data/PB2
@@ -94,6 +97,7 @@ STAR \
 --readFilesIn ${i}_1.fq.gz ${i}_2.fq.gz \
 --outFileNamePrefix /home/Sundongxiao/WORKSPACE/lhc/STAR-2.7.9a/data/PB2/${i}.sorted \
 --outBAMsortingThreadN 5
+done
 
 #Gland
 cd ~/data/Gland
@@ -109,4 +113,4 @@ STAR \
 --readFilesIn ${i}_1.fq.gz ${i}_2.fq.gz \
 --outFileNamePrefix /home/Sundongxiao/WORKSPACE/lhc/STAR-2.7.9a/data/Gland/${i}.sorted \
 --outBAMsortingThreadN 5
-
+done
