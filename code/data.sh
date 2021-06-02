@@ -1,9 +1,3 @@
-#!/bin/bash
-#SBATCH -J Data
-#SBATCH -p cast
-#SBATCH -N 1
-#SBATCH --cpus-per-task 2
-
 #1. Access to publihed RNA-seq data
 
 #Create environment variables
