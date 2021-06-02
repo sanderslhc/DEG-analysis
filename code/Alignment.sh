@@ -114,3 +114,21 @@ STAR \
 --outFileNamePrefix /home/Sundongxiao/WORKSPACE/lhc/STAR-2.7.9a/data/Gland/${i}.sorted \
 --outBAMsortingThreadN 5
 done
+
+#get count value
+#Jejunum
+featurecount \
+-T 5 \
+-t exon \
+-g gene_id \
+-a /home/Sundongxiao/WORKSPACE/lhc/genome/Bos_taurus.ARS-UCD1.2.103.gtf \
+-o counts_NP.txt \
+NP1.sorted.bam NP2.sorted.bam NP3.sorted.bam
+
+featurecount \
+-T 5 \
+-t exon \
+-g gene_id \
+-a /home/Sundongxiao/WORKSPACE/lhc/genome/Bos_taurus.ARS-UCD1.2.103.gtf \
+-o counts_DP.txt \
+DP1.sorted.bam DP2.sorted.bam DP3.sorted.bam
