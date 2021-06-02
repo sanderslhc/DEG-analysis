@@ -1,9 +1,3 @@
-#!/bin/bash
-#SBATCH -J QC
-#SBATCH -p cast
-#SBATCH -N 1
-#SBATCH --cpus-per-task 2
-
 cd ~/data/Jejunum
 mkdir fastQC
 for i in $(ls *_1.fq.gz)
