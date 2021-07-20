@@ -12,7 +12,7 @@ row.names(a) <- a$ID
 a <- a[,-1]
 
 
-##筛选中位绝对偏差前75%的基因，至少MAD大于0.01
+##Screen the top 75% of the genes with the median absolute deviation > 0.01
 m.vars=apply(a,1,var)
 datExpr0=a[which(m.vars>quantile(m.vars, probs = seq(0, 1, 0.25))[4]),]
 
@@ -23,7 +23,7 @@ WGCNA_matrix = t(datExpr0)
 dataExpr0 <- WGCNA_matrix
 dataExpr <- dataExpr0
 
-## 检测缺失值
+## Detect missing values
 gsg = goodSamplesGenes(dataExpr, verbose = 3)
 if (!gsg$allOK){
   if (sum(!gsg$goodGenes)>0) 
@@ -40,7 +40,7 @@ nSamples = nrow(dataExpr)
 dim(dataExpr)
 head(dataExpr)[,1:8]
 
-#计算β值
+#calculate 尾 value
 powers = c(c(1:10), seq(from = 12, to=30, by=2))
 sft = pickSoftThreshold(dataExpr, powerVector = powers, verbose = 5)
 par(mfrow = c(1,2))
@@ -57,11 +57,11 @@ plot(sft$fitIndices[,1], sft$fitIndices[,5],
      main = paste("Mean connectivity"))
 text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
 sft
-#so β=16
+#so 尾=16
 
-#构建共表达矩阵
+#build a co-expression matrix
 corType = "pearson"
-exprMat <- "E:/R/results/LiverFemaleClean.txt" 
+exprMat <- "E:/R/results/ICVClean.txt" 
 type="unsigned"
 net = blockwiseModules(dataExpr, power = 12, maxBlockSize = 12000,
                        TOMType = type, minModuleSize = 100,
@@ -89,11 +89,11 @@ plotEigengeneNetworks(MEs_col, "Eigengene adjacency heatmap",
                       marHeatmap = c(3,4,2,2), plotDendrograms = T, 
                       xLabelsAngle = 90)
 
-#同性状关联分析
+#co-traits association analysis
 design=model.matrix(~0+ traitData$tissue)
 colnames(design)=levels(as.factor(traitData$tissue))
 moduleColors <- labels2colors(net$colors)
-MEs0 = moduleEigengenes(datExpr, moduleColors)$eigengenes
+MEs0 = moduleEigengenes(dataExpr, moduleColors)$eigengenes
 MEs = orderMEs(MEs0)
 moduleTraitCor = cor(MEs, design , use = "p");
 moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples)
@@ -115,7 +115,7 @@ labeledHeatmap(Matrix = moduleTraitCor,
                main = paste("Module-trait relationships"))
 
 
-##可视化网络
+##Visual network
 load(net$TOMFiles[1], verbose=T)
 TOM <- as.matrix(TOM)
 dissTOM = 1-TOM
@@ -123,7 +123,8 @@ plotTOM = dissTOM^7
 diag(plotTOM) = NA
 TOMplot(plotTOM, net$dendrograms, moduleColors, 
         main = "Network heatmap plot, all genes")
-#随机选取400个基因
+
+#Randomly select 400 genes to perform heatmap
 nSelect = 400
 set.seed(10)
 select = sample(nGenes, size = nSelect)
@@ -135,7 +136,7 @@ plotDiss = selectTOM^7;
 diag(plotDiss) = NA;
 TOMplot(plotDiss, selectTree, selectColors, main = "Network heatmap plot, selected genes")
 
-#提取模块基因
+#extract genes from candidate module
 module='pink'
 probes=colnames(datExpr)
 inModule=(moduleColors==module)
@@ -143,15 +144,15 @@ modProbes=probes[inModule]
 head(modProbes)
 write.csv(modProbes, file = 'E:/R/results/module-gene/case-control/ICV/pink.csv')
 
-#GO/KEGG分析
-setwd('E:/R/workspace/AS')
+#GO/KEGG analysis
+setwd('E:/R/results/module-gene/case-control/ICV/')
 library(clusterProfiler)
 library(org.Bt.eg.db)
 
 rt <- read.csv("pink.csv",header = T)
 
 eg <- bitr(rt$id,fromType = "SYMBOL",toType = "ENTREZID",OrgDb = org.Bt.eg.db)  
-dim(eg)  #195   2
+dim(eg)  
 
 ego <- enrichGO(eg$ENTREZID,org.Bt.eg.db,ont = "ALL",pvalueCutoff = 0.05,qvalueCutoff = 0.05,readable = TRUE)  #GO
 write.csv(ego,"E:/R/results/WGCNA/pink-GO.csv",row.names = F) 
