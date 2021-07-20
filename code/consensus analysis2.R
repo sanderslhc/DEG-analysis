@@ -183,127 +183,61 @@ plotDendroAndColors(consTree, moduleColors,
                     addGuide = TRUE, guideHang = 0.05,
                     main = "Consensus gene dendrogram and module colors")
 
-lnames = load("CASE-networkConstruction-auto.RData")
+lnames = load("CASE-02-networkConstruction-auto.RData")
 lnames
 # Rename variables to avoid conflicts
-femaleLabels = moduleLabels;
-femaleColors = moduleColors;
-femaleTree = geneTree;
-femaleMEs = orderMEs(MEs, greyName = "ME0");
-
-
-#=====================================================================================
-#
-#  Code chunk 3
-#
-#=====================================================================================
-
-
-lnames = load("Consensus-NetworkConstruction-auto.RData")
-lnames
-
-
-#=====================================================================================
-#
-#  Code chunk 4
-#
-#=====================================================================================
-
+caseLabels = moduleLabels;
+caseColors = moduleColors;
+caseTree = geneTree;
+caseMEs = orderMEs(MEs, greyName = "ME0");
 
 # Isolate the module labels in the order they appear in ordered module eigengenes
-femModuleLabels = substring(names(femaleMEs), 3)
+caseModuleLabels = substring(names(caseMEs), 3)
 consModuleLabels = substring(names(consMEs[[1]]$data), 3)
 # Convert the numeric module labels to color labels
-femModules = labels2colors(as.numeric(femModuleLabels))
+caseModules = labels2colors(as.numeric(caseModuleLabels))
 consModules = labels2colors(as.numeric(consModuleLabels))
-# Numbers of female and consensus modules
-nFemMods = length(femModules)
+# Numbers of case and consensus modules
+ncaseMods = length(caseModules)
 nConsMods = length(consModules)
 # Initialize tables of p-values and of the corresponding counts
-pTable = matrix(0, nrow = nFemMods, ncol = nConsMods);
-CountTbl = matrix(0, nrow = nFemMods, ncol = nConsMods);
+pTable = matrix(0, nrow = ncaseMods, ncol = nConsMods);
+CountTbl = matrix(0, nrow = ncaseMods, ncol = nConsMods);
 # Execute all pairwaise comparisons
-for (fmod in 1:nFemMods)
+for (camod in 1:ncasemMods)
   for (cmod in 1:nConsMods)
   {
-    femMembers = (femaleColors == femModules[fmod]);
+    caseMembers = (caseColors == caseModules[camod]);
     consMembers = (moduleColors == consModules[cmod]);
-    pTable[fmod, cmod] = -log10(fisher.test(femMembers, consMembers, alternative = "greater")$p.value);
-    CountTbl[fmod, cmod] = sum(femaleColors == femModules[fmod] & moduleColors ==
+    pTable[camod, cmod] = -log10(fisher.test(caseMembers, consMembers, alternative = "greater")$p.value);
+    CountTbl[camod, cmod] = sum(caseColors == caseModules[fmod] & moduleColors ==
                                  consModules[cmod])
   }
-
-
-#=====================================================================================
-#
-#  Code chunk 5
-#
-#=====================================================================================
-
 
 # Truncate p values smaller than 10^{-50} to 10^{-50} 
 pTable[is.infinite(pTable)] = 1.3*max(pTable[is.finite(pTable)]);
 pTable[pTable>50 ] = 50 ;
 # Marginal counts (really module sizes)
-femModTotals = apply(CountTbl, 1, sum)
+caseModTotals = apply(CountTbl, 1, sum)
 consModTotals = apply(CountTbl, 2, sum)
 # Actual plotting
 sizeGrWindow(10,7 );
-pdf(file = "Plots/ConsensusVsFemaleModules.pdf", wi = 10, he = 7);
 par(mfrow=c(1,1));
 par(cex = 1.0);
 par(mar=c(8, 10.4, 2.7, 1)+0.3);
 # Use function labeledHeatmap to produce the color-coded table with all the trimmings
-tiff(file = "E:/转录组分析-奶牛副结核/李厚诚-文章修改图/WGCNA/Peripheral blood.tiff", res = 600, width = 2800, height = 2000, compression = "lzw")
 labeledHeatmap(Matrix = pTable,
                xLabels = paste(" ", consModules),
-               yLabels = paste(" ", femModules),
+               yLabels = paste(" ", caseModules),
                xColorWidth = 0.5 * strheight("M"),
                yColorWidth = 0.25 * strwidth("M"), 
                colorLabels = TRUE, plotLegend = FALSE,
                xSymbols = paste("Cons ", consModules, ": ", consModTotals, sep=""),
-               ySymbols = paste("Case ", femModules, ": ", femModTotals, sep=""),
+               ySymbols = paste("Case ", caseModules, ": ", caseModTotals, sep=""),
                textMatrix = CountTbl,
                colors = greenWhiteRed(100)[50:100],
                main = "Correspondence of Case set-specific and Case-Control consensus modules",
                cex.main= 0.7, cex.text = 0.6, cex.lab.x = 0.55,cex.lab.y = 0.43, setStdMargins = FALSE);
-dev.off();
-?labeledHeatmap
-#=====================================================================================
-#
-#  Code chunk 1
-#
-#=====================================================================================
-
-
-# Display the current working directory
-getwd();
-# If necessary, change the path below to the directory where the data files are stored. 
-# "." means current directory. On Windows use a forward slash / instead of the usual \.
-workingDir = "E:/R/workspace/WGCNA/PB";
-setwd(workingDir); 
-# Load the WGCNA package
-library(WGCNA)
-# The following setting is important, do not omit.
-options(stringsAsFactors = FALSE);
-# Load the data saved in the first part
-lnames = load(file = "Consensus-dataInput.RData");
-#The variable lnames contains the names of loaded variables.
-lnames
-
-# Also load results of network analysis
-lnames = load(file = "Consensus-NetworkConstruction-auto.RData");
-lnames
-exprSize = checkSets(multiExpr);
-nSets = exprSize$nSets;
-
-
-#=====================================================================================
-#
-#  Code chunk 2
-#
-#=====================================================================================
-
 
 # Set up variables to contain the module-trait correlations
 moduleTraitCor = list();
@@ -315,20 +249,11 @@ for (set in 1:nSets)
   moduleTraitPvalue[[set]] = corPvalueFisher(moduleTraitCor[[set]], exprSize$nSamples[set]);
 }
 
-
-#=====================================================================================
-#
-#  Code chunk 3
-#
-#=====================================================================================
-
-
 # Convert numerical lables to colors for labeling of modules in the plot
 MEColors = labels2colors(as.numeric(substring(names(consMEs[[1]]$data), 3)));
 MEColorNames = paste("ME", MEColors, sep="");
 # Open a suitably sized window (the user should change the window size if necessary)
 sizeGrWindow(10,7)
-pdf(file = "Plots/ModuleTraitRelationships-female.pdf", wi = 10, he = 7);
 # Plot the module-trait relationship table for set number 1
 set = 1
 textMatrix =  paste(signif(moduleTraitCor[[set]], 2), "\n(",
@@ -346,14 +271,13 @@ labeledHeatmap(Matrix = moduleTraitCor[[set]],
                cex.text = 0.5,
                zlim = c(-1,1),
                main = paste("Module--trait relationships in", setLabels[set]))
-dev.off();
+
 # Plot the module-trait relationship table for set number 2
 set = 2
 textMatrix =  paste(signif(moduleTraitCor[[set]], 2), "\n(",
                     signif(moduleTraitPvalue[[set]], 1), ")", sep = "");
 dim(textMatrix) = dim(moduleTraitCor[[set]])
 sizeGrWindow(10,7)
-pdf(file = "Plots/ModuleTraitRelationships-male.pdf", wi = 10, he = 7);
 par(mar = c(6, 8.8, 3, 2.2));
 labeledHeatmap(Matrix = moduleTraitCor[[set]],
                xLabels = names(Traits[[set]]$data),
@@ -366,15 +290,6 @@ labeledHeatmap(Matrix = moduleTraitCor[[set]],
                cex.text = 0.5,
                zlim = c(-1,1),
                main = paste("Module--trait relationships in", setLabels[set]))
-dev.off();
-
-
-#=====================================================================================
-#
-#  Code chunk 4
-#
-#=====================================================================================
-
 
 # Initialize matrices to hold the consensus correlation and p-value
 consensusCor = matrix(NA, nrow(moduleTraitCor[[1]]), ncol(moduleTraitCor[[1]]));
@@ -388,19 +303,10 @@ positive = moduleTraitCor[[1]] > 0 & moduleTraitCor[[2]] > 0;
 consensusCor[positive] = pmin(moduleTraitCor[[1]][positive], moduleTraitCor[[2]][positive]);
 consensusPvalue[positive] = pmax(moduleTraitPvalue[[1]][positive], moduleTraitPvalue[[2]][positive]);
 
-
-#=====================================================================================
-#
-#  Code chunk 5
-#
-#=====================================================================================
-
-
 textMatrix =  paste(signif(consensusCor, 2), "\n(",
                     signif(consensusPvalue, 1), ")", sep = "");
 dim(textMatrix) = dim(moduleTraitCor[[set]])
 sizeGrWindow(10,7)
-pdf(file = "Plots/ModuleTraitRelationships-consensus.pdf", wi = 10, he = 7);
 par(mar = c(6, 8.8, 3, 2.2));
 labeledHeatmap(Matrix = consensusCor,
                xLabels = names(Traits[[set]]$data),
@@ -415,159 +321,10 @@ labeledHeatmap(Matrix = consensusCor,
                main = paste("Consensus module--trait relationships across\n",
                             paste(setLabels, collapse = " and ")))
 
+#extract genes from candidate module
 module='red'
 probes=colnames(multiExpr)
 inModule=(moduleColors==module)
 modProbes=probes[inModule]
 head(modProbes)
-write.csv(modProbes, file = 'E:/R/results/module-gene/case-control/gland/red.csv')
-#=====================================================================================
-#
-#  Code chunk 6
-#
-#=====================================================================================
-
-
-file = gzfile(description = "GeneAnnotation.csv.gz");
-annot = read.csv(file = file);
-# Match probes in the data set to the probe IDs in the annotation file 
-probes = names(multiExpr[[1]]$data)
-probes2annot = match(probes, annot$substanceBXH)
-
-
-#=====================================================================================
-#
-#  Code chunk 7
-#
-#=====================================================================================
-
-
-consMEs.unord = multiSetMEs(multiExpr, universalColors = moduleLabels, excludeGrey = TRUE)
-GS = list();
-kME = list();
-for (set in 1:nSets)
-{
-  GS[[set]] = corAndPvalue(multiExpr[[set]]$data, Traits[[set]]$data);
-  kME[[set]] = corAndPvalue(multiExpr[[set]]$data, consMEs.unord[[set]]$data);
-}
-
-
-#=====================================================================================
-#
-#  Code chunk 8
-#
-#=====================================================================================
-
-
-GS.metaZ = (GS[[1]]$Z + GS[[2]]$Z)/sqrt(2);
-kME.metaZ = (kME[[1]]$Z + kME[[2]]$Z)/sqrt(2);
-GS.metaP = 2*pnorm(abs(GS.metaZ), lower.tail = FALSE);
-kME.metaP = 2*pnorm(abs(kME.metaZ), lower.tail = FALSE);
-
-
-#=====================================================================================
-#
-#  Code chunk 9
-#
-#=====================================================================================
-
-
-GSmat = rbind(GS[[1]]$cor, GS[[2]]$cor, GS[[1]]$p, GS[[2]]$p, GS.metaZ, GS.metaP);
-nTraits = checkSets(Traits)$nGenes
-traitNames = colnames(Traits[[1]]$data)
-dim(GSmat) = c(nGenes, 6*nTraits)
-rownames(GSmat) = probes;
-colnames(GSmat) = spaste(
-  c("GS.set1.", "GS.set2.", "p.GS.set1.", "p.GS.set2.", "Z.GS.meta.", "p.GS.meta"),
-  rep(traitNames, rep(6, nTraits)))
-# Same code for kME:
-kMEmat = rbind(kME[[1]]$cor, kME[[2]]$cor, kME[[1]]$p, kME[[2]]$p, kME.metaZ, kME.metaP);
-MEnames = colnames(consMEs.unord[[1]]$data);
-nMEs = checkSets(consMEs.unord)$nGenes
-dim(kMEmat) = c(nGenes, 6*nMEs)
-rownames(kMEmat) = probes;
-colnames(kMEmat) = spaste(
-  c("kME.set1.", "kME.set2.", "p.kME.set1.", "p.kME.set2.", "Z.kME.meta.", "p.kME.meta"),
-  rep(MEnames, rep(6, nMEs)))
-
-
-#=====================================================================================
-#
-#  Code chunk 10
-#
-#=====================================================================================
-
-
-info = data.frame(Probe = probes, GeneSymbol = annot$gene_symbol[probes2annot],
-                  EntrezID = annot$LocusLinkID[probes2annot],
-                  ModuleLabel = moduleLabels,
-                  ModuleColor = labels2colors(moduleLabels),
-                  GSmat,
-                  kMEmat);
-write.csv(info, file = "consensusAnalysis-CombinedNetworkResults.csv",
-          row.names = FALSE, quote = FALSE);
-
-#=====================================================================================
-#
-#  Code chunk 1
-#
-#=====================================================================================
-
-
-# Display the current working directory
-getwd();
-# If necessary, change the path below to the directory where the data files are stored. 
-# "." means current directory. On Windows use a forward slash / instead of the usual \.
-workingDir = ".";
-setwd(workingDir); 
-# Load the WGCNA package
-library(WGCNA)
-# The following setting is important, do not omit.
-options(stringsAsFactors = FALSE);
-# Basic settings: we work with two data sets
-nSets = 2;
-# For easier labeling of plots, create a vector holding descriptive names of the two sets.
-setLabels = c("case", "control")
-shortLabels = c("case", "control")
-# Load the data saved in the first part
-lnames = load(file = "Consensus-dataInput.RData");
-#The variable lnames contains the names of loaded variables.
-lnames
-# Load the results of network analysis, tutorial part 2.a
-lnames = load(file = "Consensus-NetworkConstruction-auto.RData");
-lnames
-
-
-#=====================================================================================
-#
-#  Code chunk 2
-#
-#=====================================================================================
-
-
-# Create a variable weight that will hold just the body weight of mice in both sets
-weight = vector(mode = "list", length = nSets);
-for (set in 1:nSets)
-{
-  weight[[set]] = list(data = as.data.frame(Traits[[set]]$data));
-  names(weight[[set]]$data) = "weight"
-}
-# Recalculate consMEs to give them color names
-consMEsC = multiSetMEs(multiExpr, universalColors = moduleColors);
-# We add the weight trait to the eigengenes and order them by consesus hierarchical clustering:
-MET = consensusOrderMEs(addTraitToMEs(consMEsC, weight));
-
-
-#=====================================================================================
-#
-#  Code chunk 3
-#
-#=====================================================================================
-
-
-sizeGrWindow(8,10);
-pdf(file = "Plots/EigengeneNetworks.pdf", width= 8, height = 10);
-par(cex = 0.9)
-plotEigengeneNetworks(MET, setLabels, marDendro = c(0,2,2,1), marHeatmap = c(3,3,2,1),
-                      zlimPreservation = c(0.5, 1), xLabelsAngle = 90)
-dev.off();
+write.csv(modProbes, file = 'E:/R/results/module-gene/case-control/ICV/red.csv')
