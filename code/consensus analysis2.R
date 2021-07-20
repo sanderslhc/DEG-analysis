@@ -4,7 +4,7 @@ options(stringsAsFactors = F)
 getwd();
 # If necessary, change the path below to the directory where the data files are stored. 
 # "." means current directory. On Windows use a forward slash / instead of the usual \.
-  workingDir = "E:/R/workspace/WGCNA/consensus module/ICV";
+workingDir = "E:/R/workspace/WGCNA/consensus module/ICV";
 setwd(workingDir); 
 # Load the package
 library(WGCNA);
